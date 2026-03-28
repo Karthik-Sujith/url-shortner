@@ -60,6 +60,13 @@
       overflow: hidden;
     }
 
+    /* WIDE SCREEN WRAPPER */
+    .layout-inner {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
     /* LEFT PANEL */
     .left-panel {
       width: 420px;
@@ -428,6 +435,237 @@
       margin-bottom: 10px;
       opacity: 0.4;
     }
+
+    /* ================================
+       RESPONSIVE MEDIA QUERIES
+    ================================ */
+
+    /* MIN WIDTH 1600px — centered with max-width */
+    @media (min-width: 1600px) {
+      body {
+        overflow: hidden;
+      }
+
+      nav {
+        padding: 14px calc((100vw - 1400px) / 2);
+      }
+
+      .layout {
+        justify-content: center;
+      }
+
+      .layout-inner {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        border-left: 1px solid #ececec;
+        border-right: 1px solid #ececec;
+      }
+
+      .left-panel {
+        width: 460px;
+      }
+    }
+
+    /* MAX WIDTH 1024px — slightly tighter layout */
+    @media (max-width: 1024px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
+      .layout {
+        flex-direction: column;
+        overflow: auto;
+      }
+
+      .layout-inner {
+        flex-direction: column;
+      }
+
+      .left-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ececec;
+        padding: 28px 32px;
+        gap: 18px;
+      }
+
+      .stats-row {
+        margin-top: 0;
+      }
+
+      .right-panel {
+        padding: 28px 32px;
+        min-height: 420px;
+      }
+
+      nav {
+        padding: 14px 32px;
+      }
+    }
+
+    /* MAX WIDTH 768px — stack everything, smaller text */
+    @media (max-width: 768px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
+      nav {
+        padding: 12px 20px;
+      }
+
+      .nav-tag {
+        font-size: 11px;
+        padding: 3px 10px;
+      }
+
+      .left-panel {
+        padding: 24px 20px;
+        gap: 16px;
+      }
+
+      .panel-title {
+        font-size: 20px;
+      }
+
+      .right-panel {
+        padding: 24px 20px;
+        min-height: 380px;
+      }
+
+      .right-header h2 {
+        font-size: 15px;
+      }
+
+      th {
+        font-size: 10px;
+        padding: 10px 12px;
+      }
+
+      td {
+        padding: 11px 12px;
+        font-size: 12px;
+      }
+
+      .stat-num {
+        font-size: 20px;
+      }
+
+      /* Hide Original URL column on tablet */
+      th:nth-child(2),
+      td:nth-child(2) {
+        display: none;
+      }
+    }
+
+    /* MAX WIDTH 600px — full mobile */
+    @media (max-width: 600px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
+      nav {
+        padding: 12px 16px;
+      }
+
+      .logo {
+        font-size: 16px;
+      }
+
+      .nav-tag {
+        display: none;
+      }
+
+      .left-panel {
+        padding: 20px 16px;
+        gap: 14px;
+      }
+
+      .panel-title {
+        font-size: 18px;
+      }
+
+      .panel-subtitle {
+        font-size: 12px;
+      }
+
+      input {
+        font-size: 13px;
+        padding: 10px 12px 10px 36px;
+      }
+
+      button.primary {
+        font-size: 13px;
+        padding: 11px;
+      }
+
+      .stats-row {
+        gap: 8px;
+      }
+
+      .stat-box {
+        padding: 10px;
+      }
+
+      .stat-num {
+        font-size: 18px;
+      }
+
+      .stat-label {
+        font-size: 10px;
+      }
+
+      .right-panel {
+        padding: 20px 16px;
+        min-height: 340px;
+      }
+
+      .right-header h2 {
+        font-size: 14px;
+      }
+
+      th {
+        font-size: 10px;
+        padding: 9px 10px;
+      }
+
+      td {
+        padding: 10px 10px;
+        font-size: 12px;
+      }
+
+      /* Hide Clicks column on mobile */
+      th:nth-child(3),
+      td:nth-child(3) {
+        display: none;
+      }
+
+      .code-pill {
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+
+      button.delete-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+
+      #result {
+        padding: 12px;
+      }
+
+      #shortLink {
+        font-size: 12px;
+      }
+
+      .copy-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -440,78 +678,80 @@
 
   <!-- LAYOUT -->
   <div class="layout">
+    <div class="layout-inner">
 
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
-      <div>
-        <div class="panel-title">Shorten your<br/><span>long URLs</span> instantly</div>
-        <div class="panel-subtitle">Paste a URL below and get a clean short link in seconds.</div>
-      </div>
+      <!-- LEFT PANEL -->
+      <div class="left-panel">
+        <div>
+          <div class="panel-title">Shorten your<br/><span>long URLs</span> instantly</div>
+          <div class="panel-subtitle">Paste a URL below and get a clean short link in seconds.</div>
+        </div>
 
-      <div class="divider"></div>
+        <div class="divider"></div>
 
-      <div class="form-group">
-        <label>Destination URL</label>
-        <div class="input-wrapper">
-          <span class="icon">🔗</span>
-          <input type="text" id="urlInput" placeholder="https://your-long-url.com/..." />
+        <div class="form-group">
+          <label>Destination URL</label>
+          <div class="input-wrapper">
+            <span class="icon">🔗</span>
+            <input type="text" id="urlInput" placeholder="https://your-long-url.com/..." />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Custom Code <span style="color:#bbb;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <div class="input-wrapper">
+            <span class="icon">✏️</span>
+            <input type="text" id="customCode" placeholder="e.g. my-link" />
+          </div>
+        </div>
+
+        <button class="primary" onclick="shorten()">⚡ Generate Short Link</button>
+
+        <div id="result">
+          <div class="result-label">✅ Your short link is ready</div>
+          <div class="result-row">
+            <a id="shortLink" href="#" target="_blank"></a>
+            <button class="copy-btn" onclick="copyLink()">Copy</button>
+          </div>
+        </div>
+
+        <div id="error" class="error-box"></div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num" id="totalLinks">0</div>
+            <div class="stat-label">Total Links</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="totalClicks">0</div>
+            <div class="stat-label">Total Clicks</div>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Custom Code <span style="color:#bbb;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="input-wrapper">
-          <span class="icon">✏️</span>
-          <input type="text" id="customCode" placeholder="e.g. my-link" />
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+        <div class="right-header">
+          <h2>All Shortened URLs</h2>
+          <span class="badge" id="countBadge">0 links</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Short Code</th>
+                <th>Original URL</th>
+                <th>Clicks</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="urlList"></tbody>
+          </table>
         </div>
       </div>
 
-      <button class="primary" onclick="shorten()">⚡ Generate Short Link</button>
-
-      <div id="result">
-        <div class="result-label">✅ Your short link is ready</div>
-        <div class="result-row">
-          <a id="shortLink" href="#" target="_blank"></a>
-          <button class="copy-btn" onclick="copyLink()">Copy</button>
-        </div>
-      </div>
-
-      <div id="error" class="error-box"></div>
-
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-num" id="totalLinks">0</div>
-          <div class="stat-label">Total Links</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="totalClicks">0</div>
-          <div class="stat-label">Total Clicks</div>
-        </div>
-      </div>
     </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="right-panel">
-      <div class="right-header">
-        <h2>All Shortened URLs</h2>
-        <span class="badge" id="countBadge">0 links</span>
-      </div>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Short Code</th>
-              <th>Original URL</th>
-              <th>Clicks</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="urlList"></tbody>
-        </table>
-      </div>
-    </div>
-
   </div>
 
   <script>
@@ -584,7 +824,7 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="4" class="empty">
-              <span class="empty-icon"></span>
+              <span class="empty-icon">🔗</span>
               No links yet — paste a URL on the left!
             </td>
           </tr>`;
