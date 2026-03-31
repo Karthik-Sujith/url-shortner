@@ -10,7 +10,6 @@ const DB = './urls.json';
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 const readDB = () => JSON.parse(fs.readFileSync(DB, 'utf-8'));
 const writeDB = (data) => fs.writeFileSync(DB, JSON.stringify(data, null, 2));
@@ -33,7 +32,7 @@ app.post('/shorten', (req, res) => {
   db.push(entry);
   writeDB(db);
 
-  res.json({ shortUrl: `http://localhost:3000/${code}`, code });
+  res.json({ shortUrl: `http://localhost:${PORT}/${code}`, code });
 });
 
 // GET /all
@@ -52,15 +51,32 @@ app.delete('/delete/:code', (req, res) => {
 });
 
 // GET /:code → redirect + increment click count
-app.get('/:code', (req, res) => {
+// ⚠️ This MUST come before express.static so short codes take priority
+app.get('/:code', (req, res, next) => {
+  const code = req.params.code;
+
+  // Skip if it looks like a static file request (e.g. .css, .js, .ico)
+  if (code.includes('.')) return next();
+
   const db = readDB();
-  const index = db.findIndex(e => e.code === req.params.code);
-  if (index === -1) return res.status(404).json({ error: 'URL not found' });
+  const index = db.findIndex(e => e.code === code);
+
+  // If no matching code found, fall through to static files / 404
+  if (index === -1) return next();
 
   db[index].clicks = (db[index].clicks || 0) + 1;
   writeDB(db);
 
-  res.redirect(db[index].url);
+  // 302 redirect to the original URL
+  res.redirect(302, db[index].url);
+});
+
+// Serve static files (index.html etc.) AFTER the redirect route
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 404 fallback
+app.use((req, res) => {
+  res.status(404).send('Not found');
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
