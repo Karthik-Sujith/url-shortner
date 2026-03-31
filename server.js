@@ -5,13 +5,16 @@ const { nanoid } = require('nanoid');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const DB = './urls.json';
 
 app.use(cors());
 app.use(express.json());
 
-const readDB = () => JSON.parse(fs.readFileSync(DB, 'utf-8'));
+const readDB = () => {
+  if (!fs.existsSync(DB)) fs.writeFileSync(DB, '[]');
+  return JSON.parse(fs.readFileSync(DB, 'utf-8'));
+};
 const writeDB = (data) => fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 
 // POST /shorten
@@ -32,7 +35,11 @@ app.post('/shorten', (req, res) => {
   db.push(entry);
   writeDB(db);
 
-  res.json({ shortUrl: `http://localhost:${PORT}/${code}`, code });
+  // Dynamically build the short URL from the actual request host
+  // Works correctly both on localhost AND when live/deployed
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers.host;
+  res.json({ shortUrl: `${protocol}://${host}/${code}`, code });
 });
 
 // GET /all
@@ -50,31 +57,35 @@ app.delete('/delete/:code', (req, res) => {
   res.json({ message: 'Deleted successfully' });
 });
 
-// GET /:code → redirect + increment click count
-// ⚠️ This MUST come before express.static so short codes take priority
-app.get('/:code', (req, res, next) => {
+// GET / → serve the main app explicitly
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve static assets with index: false
+// Prevents index.html from being served as a fallback for /:code paths
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+
+// GET /:code → redirect to original URL + track clicks
+app.get('/:code', (req, res) => {
   const code = req.params.code;
-
-  // Skip if it looks like a static file request (e.g. .css, .js, .ico)
-  if (code.includes('.')) return next();
-
   const db = readDB();
   const index = db.findIndex(e => e.code === code);
 
-  // If no matching code found, fall through to static files / 404
-  if (index === -1) return next();
+  if (index === -1) {
+    return res.status(404).send(`
+      <h2 style="font-family:sans-serif">404 — Short link not found</h2>
+      <p style="font-family:sans-serif">The code <strong>${code}</strong> doesn't exist.</p>
+      <a href="/" style="font-family:sans-serif">← Back to TrimURL</a>
+    `);
+  }
 
   db[index].clicks = (db[index].clicks || 0) + 1;
   writeDB(db);
 
-  // 302 redirect to the original URL
   res.redirect(302, db[index].url);
 });
 
-// Serve static files (index.html etc.) AFTER the redirect route
-app.use(express.static(path.join(__dirname, 'public')));
-
-// 404 fallback
 app.use((req, res) => {
   res.status(404).send('Not found');
 });
